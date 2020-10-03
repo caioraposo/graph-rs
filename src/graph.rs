@@ -62,7 +62,15 @@ impl<T: PartialEq> Graph<T> {
         }
         None
     }
-                
+ 
+    /// Gets vertex u's adjacency list.
+    pub fn adj_list(&self, u: usize) -> AdjListIterator<T> {
+        AdjListIterator {
+            graph: self,
+            next_e: self.nodes[u].first,
+        }
+    }
+               
 }
 
 impl<'a> Graph<&'a str> {
@@ -86,6 +94,26 @@ impl<'a> Graph<&'a str> {
         self.add_edge(t, s, weight);
     }
 }
+
+/// An iterator for convenient adjacency list traversal.
+pub struct AdjListIterator<'a, T> {
+    graph: &'a Graph<T>,
+    next_e: Option<usize>,
+}
+
+impl<'a, T> Iterator for AdjListIterator<'a, T> {
+    type Item = (usize, usize);
+
+    /// Produces an outgoing edge and vertex.
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next_e.map(|e| {
+            let v = self.graph.edges[e].target;
+            self.next_e = self.graph.edges[e].next;
+            (e, v)
+        })
+    }
+}
+
 
 
 mod tests {
