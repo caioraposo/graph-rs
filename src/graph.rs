@@ -1,18 +1,15 @@
-#[derive(Debug, PartialEq)]
 pub struct Node<T> {
     pub data: T,
     pub marked: bool,
     first: Option<usize>,
 }
 
-#[derive(Debug)]
 pub struct Edge {
     pub target: usize,
     pub weight: u32,
     next: Option<usize>,
 }
 
-#[derive(Debug)]
 pub struct Graph<T> {
     nodes: Vec<Node<T>>,
     edges: Vec<Edge>,
@@ -89,3 +86,49 @@ impl<'a> Graph<&'a str> {
         self.add_edge(t, s, weight);
     }
 }
+
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn check_if_node_is_in_the_graph() {
+        let mut graph = Graph::new(1, 0);
+        let n1= Node::new(1);
+        let n2= Node::new(2);
+        graph.add_node(n1);
+        graph.add_node(n2);
+
+        assert_eq!(graph.nodes[0].data, 1);
+        assert_eq!(graph.nodes[1].data, 2);
+    }
+
+    #[test]
+    fn add_directed_edge() {
+        let mut graph = Graph::new(1, 0);
+        let n1= Node::new(1);
+        let n2= Node::new(2);
+        graph.add_node(n1);
+        graph.add_node(n2);
+        graph.add_edge(0, 1, 0);
+
+        assert_eq!(graph.edges[0].target, 1);
+        assert_eq!(graph.edges[0].weight, 0);
+    }
+
+    #[test]
+    fn add_undirected_edge() {
+        let mut graph = Graph::new(1, 0);
+        let n1= Node::new(1);
+        let n2= Node::new(2);
+        graph.add_node(n1);
+        graph.add_node(n2);
+        graph.add_undirected_edge(0, 1, 0);
+
+        assert_eq!(graph.edges[0].target, 1);
+        assert_eq!(graph.edges[0].weight, 0);
+        assert_eq!(graph.edges[1].target, 0);
+        assert_eq!(graph.edges[1].weight, 0);
+    }
+}
+        
