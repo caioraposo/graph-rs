@@ -1,3 +1,8 @@
+mod util;
+
+use std::fmt;
+use std::fmt::Display;
+
 pub struct Node<T> {
     pub data: T,
     pub marked: bool,
@@ -6,7 +11,7 @@ pub struct Node<T> {
 
 pub struct Edge {
     pub target: usize,
-    pub weight: u32,
+    pub weight: u64,
     next: Option<usize>,
 }
 
@@ -16,7 +21,7 @@ pub struct Graph<T> {
 }
 
 impl Edge {
-    pub fn new(target: usize, weight: u32) -> Self {
+    pub fn new(target: usize, weight: u64) -> Self {
         Edge { target, weight, next: None }
     }
 }
@@ -41,15 +46,15 @@ impl<T: PartialEq> Graph<T> {
     }
 
     /// Given the index of two nodes create a edge between them
-    pub fn add_edge(&mut self, source: usize, target: usize, weight: u32) {
+    pub fn add_edge(&mut self, source: usize, target: usize, weight: u64) {
         let mut e = Edge::new(target, weight);
         e.next = self.nodes[source].first;
         self.nodes[source].first = Some(self.edges.len());
         self.edges.push(e);
     }
 
-    // An undirected edge is just two directed edges
-    pub fn add_undirected_edge(&mut self, source: usize, target: usize, weight: u32) {
+    // Just two directed edges
+    pub fn add_undirected_edge(&mut self, source: usize, target: usize, weight: u64) {
         self.add_edge(source, target, weight);
         self.add_edge(target, source, weight);
     }
@@ -70,6 +75,13 @@ impl<T: PartialEq> Graph<T> {
             next_e: self.nodes[u].first,
         }
     }
+
+    // Unmark all nodes
+    pub fn unmark(&mut self) {
+        for node in &mut self.nodes {
+            node.marked = false
+        }
+    }
                
 }
 
@@ -81,19 +93,38 @@ impl<'a> Graph<&'a str> {
         }
     }
 
-    pub fn add_edge_str(&mut self, source: &'a str, target: &'a str, weight: u32) {
+    pub fn add_edge_str(&mut self, source: &'a str, target: &'a str, weight: u64) {
         let s = self.get_node_index(source).expect("Node not in the graph.");
         let t = self.get_node_index(target).expect("Node not in the graph.");
         self.add_edge(s, t, weight);
     }
 
-    pub fn add_undirected_edge_str(&mut self, source: &'a str, target: &'a str, weight: u32) {
+    pub fn add_undirected_edge_str(&mut self, source: &'a str, target: &'a str, weight: u64) {
         let s = self.get_node_index(source).expect("Node not in the graph.");
         let t = self.get_node_index(target).expect("Node not in the graph.");
         self.add_edge(s, t, weight);
         self.add_edge(t, s, weight);
     }
 }
+
+impl<T: Display + PartialEq> Display for Graph<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
+        for (i, node) in self.nodes.iter().enumerate() {
+            if node.marked {
+                write!(f, "{:2} {} [X]: ", i, node.data).ok();
+            } else {
+                write!(f, "{:2} {} [ ]: ", i, node.data).ok();
+            }
+            for (e, v) in self.adj_list(i) {
+                write!(f, "{}({}) -> ", self.nodes[v].data, self.edges[e].weight).ok();
+            }
+            write!(f, "λ").ok();
+            writeln!(f).ok();
+        }
+        Ok(())
+    }
+}
+
 
 /// An iterator for convenient adjacency list traversal.
 pub struct AdjListIterator<'a, T> {
@@ -114,8 +145,7 @@ impl<'a, T> Iterator for AdjListIterator<'a, T> {
     }
 }
 
-
-
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -159,4 +189,3 @@ mod tests {
         assert_eq!(graph.edges[1].weight, 0);
     }
 }
-        
