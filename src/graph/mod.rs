@@ -5,7 +5,8 @@ use std::fmt::Display;
 
 pub struct Node<T> {
     pub data: T,
-    pub marked: bool,
+    // By using a integer we can keep track of the order they were visited
+    pub visited: u64,
     first: Option<usize>,
 }
 
@@ -28,7 +29,7 @@ impl Edge {
 
 impl<T> Node<T> {
     pub fn new(data: T) -> Self {
-        Node { data, marked: false, first: None }
+        Node { data, visited: 0, first: None }
     }
 }
 
@@ -79,7 +80,7 @@ impl<T: PartialEq> Graph<T> {
     // Unmark all nodes
     pub fn unmark(&mut self) {
         for node in &mut self.nodes {
-            node.marked = false
+            node.visited = 0;
         }
     }
                
@@ -110,8 +111,8 @@ impl<'a> Graph<&'a str> {
 impl<T: Display + PartialEq> Display for Graph<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
         for (i, node) in self.nodes.iter().enumerate() {
-            if node.marked {
-                write!(f, "{:2} {} [X]: ", i, node.data).ok();
+            if node.visited != 0 {
+                write!(f, "{:2} {} [{}]: ", i, node.data, node.visited).ok();
             } else {
                 write!(f, "{:2} {} [ ]: ", i, node.data).ok();
             }

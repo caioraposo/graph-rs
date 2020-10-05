@@ -12,19 +12,21 @@ impl<T: PartialEq> Graph<T> {
         let mut heap = BinaryHeap::new();
         let mut map = HashMap::new();
         let mut dist = 0;
+        let mut cicles = 0;
 
         heap.push((Reverse(0), source));
         while let Some((Reverse(dist_u), u)) = heap.pop() {
-            if self.nodes[u].marked { continue; }
+            if self.nodes[u].visited != 0 { continue; }
+            cicles += 1;
             for (e, v) in self.adj_list(u) {
-                if !self.nodes[v].marked {
+                if self.nodes[v].visited == 0 {
                     let dist_v = dist_u + self.edges[e].weight;
                     heap.push((Reverse(dist_v), v));
                     map.insert(v, u);
                 }
             }
             dist = dist_u;
-            self.nodes[u].marked = true;
+            self.nodes[u].visited = cicles;
             if verbose  {
                 println!("{:?}", dist);
                 println!("{:?}", map);
@@ -47,12 +49,14 @@ impl<T: PartialEq> Graph<T> {
         let mut map = HashMap::new();
         let mut dist = 0;
         let cost_h = heu[source];
+        let mut cicles = 0;
 
         heap.push((Reverse(cost_h), dist, source));
         while let Some((Reverse(cost_h), dist_u, u)) = heap.pop() {
-            if self.nodes[u].marked { continue; }
+            if self.nodes[u].visited != 0 { continue; }
+            cicles += 1;
             for (e, v) in self.adj_list(u) {
-                if !self.nodes[v].marked {
+                if self.nodes[v].visited == 0 {
                     let dist_v = dist_u + self.edges[e].weight; // g(n)
                     let cost_h = dist_v + heu[v]; // f(n) = g(n) + h(n)
                     heap.push((Reverse(cost_h), dist_v, v));
@@ -60,7 +64,7 @@ impl<T: PartialEq> Graph<T> {
                 }
             }
             dist = dist_u;
-            self.nodes[u].marked = true;
+            self.nodes[u].visited = cicles;
             if verbose  {
                 println!("{:?}", dist);
                 println!("{:?}", map);
