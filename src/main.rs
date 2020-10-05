@@ -27,4 +27,9 @@ fn main() {
 
     println!();
     println!("{}", graph);
+
+    println!("A*");
+    let (dist, path) = graph.astar(0, 12, &heuristics, false);
+    println!("{:?} {:?}", dist, path);
+    println!("{}", graph);
 }
