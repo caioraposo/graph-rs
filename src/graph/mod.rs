@@ -2,6 +2,7 @@ mod util;
 
 use std::fmt;
 use std::fmt::Display;
+use std::collections::VecDeque;
 
 pub struct Node<T> {
     pub data: T,
@@ -105,6 +106,13 @@ impl<'a> Graph<&'a str> {
         let t = self.get_node_index(target).expect("Node not in the graph.");
         self.add_edge(s, t, weight);
         self.add_edge(t, s, weight);
+    }
+
+    pub fn print_path(&self, path: &VecDeque<usize>) {
+        for i in path {
+            print!("{} -> ", self.nodes[*i].data);
+        }
+        println!("λ");
     }
 }
 
