@@ -1,4 +1,4 @@
-use graph_rs::graph::Graph;
+use graph_rs::graph::{Graph, Node};
 
 fn main() {
     let mut graph = Graph::new(13,16);
@@ -21,15 +21,28 @@ fn main() {
     }
 
     println!("{}", graph);
-    println!("Dijsktra");
-    let (dist, path) = graph.dijsktra(0, 12, false);
-    println!("{:?} {:?}", dist, path);
 
-    println!();
+    println!("DFS");
+    let (dist, path) = graph.dfs(0, 12);
+    print!("{:?} ", dist);
+    graph.print_path(&path);
+    println!("{}", graph);
+
+    println!("BFS");
+    let (dist, path) = graph.bfs(0, 12);
+    print!("{:?} ", dist);
+    graph.print_path(&path);
+    println!("{}", graph);
+    
+    println!("Dijsktra");
+    let (dist, path) = graph.dijsktra(0, 12);
+    print!("{:?} ", dist);
+    graph.print_path(&path);
     println!("{}", graph);
 
     println!("A*");
-    let (dist, path) = graph.astar(0, 12, &heuristics, false);
-    println!("{:?} {:?}", dist, path);
+    let (dist, path) = graph.astar(0, 12, &heuristics);
+    print!("{:?} ", dist);
+    graph.print_path(&path);
     println!("{}", graph);
 }
